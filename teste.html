@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Criptografia - AES & RSA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2a71d0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    button {
+      background-color: #2a71d0;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #1a57a5;
+    }
+
+    .output {
+      margin-top: 20px;
+      background-color: #eef3f9;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Criptografia Simétrica e Assimétrica</h1>
+
+    <label for="mensagem">Digite sua mensagem:</label>
+    <textarea id="mensagem" placeholder="Ex: Dados confidenciais do cliente"></textarea>
+
+    <div>
+      <button onclick="criptografarAES()">Criptografar com AES</button>
+      <button onclick="criptografarRSA()">Criptografar com RSA</button>
+    </div>
+
+    <div class="output" id="saida"></div>
+  </div>
+
+  <!-- CryptoJS para AES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <!-- JSEncrypt para RSA -->
+  <script src="https://cdn.jsdelivr.net/npm/jsencrypt@3.2.1/bin/jsencrypt.min.js"></script>
+
+  <script>
+    function criptografarAES() {
+      const mensagem = document.getElementById('mensagem').value;
+      const chave = CryptoJS.enc.Hex.parse('00112233445566778899aabbccddeeff');
+      const iv = CryptoJS.enc.Hex.parse('0102030405060708090a0b0c0d0e0f10');
+
+      const encrypted = CryptoJS.AES.encrypt(mensagem, chave, { iv: iv, mode: CryptoJS.mode.CBC });
+      const decrypted = CryptoJS.AES.decrypt(encrypted, chave, { iv: iv, mode: CryptoJS.mode.CBC });
+      const textoDecifrado = decrypted.toString(CryptoJS.enc.Utf8);
+
+      document.getElementById('saida').innerText =
+        "🔐 AES - Criptografia Simétrica\n" +
+        "Chave: 00112233445566778899aabbccddeeff\n" +
+        "IV: 0102030405060708090a0b0c0d0e0f10\n" +
+        "Mensagem Cifrada: " + encrypted.toString() + "\n" +
+        "Mensagem Decifrada: " + textoDecifrado;
+    }
+
+    function criptografarRSA() {
+      const mensagem = document.getElementById('mensagem').value;
+      const encrypt = new JSEncrypt({ default_key_size: 2048 });
+      encrypt.getKey(); // Gera par de chaves
+
+      const publicKey = encrypt.getPublicKey();
+      const privateKey = encrypt.getPrivateKey();
+
+      const mensagemCifrada = encrypt.encrypt(mensagem);
+
+      const decrypt = new JSEncrypt();
+      decrypt.setPrivateKey(privateKey);
+      const mensagemDecifrada = decrypt.decrypt(mensagemCifrada);
+
+      document.getElementById('saida').innerText =
+        "🔐 RSA - Criptografia Assimétrica\n" +
+        "Chave Pública:\n" + publicKey + "\n\n" +
+        "Mensagem Cifrada (base64):\n" + mensagemCifrada + "\n\n" +
+        "Mensagem Decifrada:\n" + mensagemDecifrada;
+    }
+  </script>
+</body>
+</html>
